@@ -1,31 +1,33 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import { Card, Input, Button, Text } from '@nextui-org/react';
-import { axiosInstance } from '../../utils/axiosInstance';
-import { getCSRFToken } from '../../utils/csrf';
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { Card, Input, Button, Text } from "@nextui-org/react";
+import { axiosInstance } from "../../utils/axiosInstance";
 
 export default function Page() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const res = await axiosInstance.post('/login', { email, password });
+      const res = await axiosInstance.post("/login", { email, password });
       const token = res.data.data.token;
-      const user = JSON.stringify(res.data.data)
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', user);
-      router.push('/');
+      const user = JSON.stringify(res.data.data);
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", user);
+      const pathAfterLogin = localStorage.getItem("path_after_login");
+      router.push(pathAfterLogin ?? "/");
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login gagal. Periksa kembali data Anda.');
+      setError(
+        err.response?.data?.message || "Login gagal. Periksa kembali data Anda."
+      );
     } finally {
       setLoading(false);
     }
@@ -34,27 +36,31 @@ export default function Page() {
   return (
     <div
       style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#f1f3f5',
-        padding: '1rem',
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#f1f3f5",
+        padding: "1rem",
       }}
     >
       <Card
         css={{
-          p: '2rem',
-          mw: '400px',
-          w: '100%',
+          p: "2rem",
+          mw: "400px",
+          w: "100%",
         }}
       >
-        <Text h3 css={{ textAlign: 'center', mb: '1.5rem' }}>
+        <Text h3 css={{ textAlign: "center", mb: "1.5rem" }}>
           Login Admin
         </Text>
 
         {error && (
-          <Text size="$sm" color="error" css={{ mb: '1rem', textAlign: 'center' }}>
+          <Text
+            size="$sm"
+            color="error"
+            css={{ mb: "1rem", textAlign: "center" }}
+          >
             {error}
           </Text>
         )}
@@ -68,7 +74,7 @@ export default function Page() {
             placeholder="Masukkan email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            css={{ mb: '1.2rem' }}
+            css={{ mb: "1.2rem" }}
           />
 
           <Input
@@ -79,7 +85,7 @@ export default function Page() {
             placeholder="Masukkan password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            css={{ mb: '1.5rem' }}
+            css={{ mb: "1.5rem" }}
           />
 
           <Button
@@ -87,9 +93,9 @@ export default function Page() {
             color="primary"
             disabled={loading}
             auto
-            css={{ w: '100%' }}
+            css={{ w: "100%" }}
           >
-            {loading ? 'Memproses...' : 'Login'}
+            {loading ? "Memproses..." : "Login"}
           </Button>
         </form>
       </Card>
