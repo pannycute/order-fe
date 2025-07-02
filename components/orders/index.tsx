@@ -1,7 +1,7 @@
 // @/components/[content]/orders/index.tsx
 import { Button, Text } from "@nextui-org/react";
 import Link from "next/link";
-import React, { useEffect, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback, useState } from "react";
 import { Flex } from "../styles/flex";
 import { TableWrapper, type Column } from "../table/table";
 import AddEditOrderForm from "./AddEditForm";
@@ -25,6 +25,19 @@ export const Orders = () => {
 
   const { showToast } = useToast();
   const { showToast: showConfirmationToast } = useConfirmationToast();
+
+  const [userRole, setUserRole] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          setUserRole(JSON.parse(userStr).role || "");
+        } catch {}
+      }
+    }
+  }, []);
 
   const handleLoadData = useCallback(
     (params: {
@@ -86,30 +99,32 @@ export const Orders = () => {
           currency: "IDR",
         }) ?? "-",
       },
-      {
-        name: "ACTIONS",
-        uid: "action",
-        sortable: false,
-        render: (order: any) => (
-          <div style={{ display: "flex", gap: 8 }}>
-            <AddEditOrderForm
-              initialData={order}
-              buttonLabel={<Edit size={16} />}
-            />
-            <Button
-              size="md"
-              color="error"
-              auto
-              aria-label={`Delete ${order.order_id}`}
-              onClick={() => handleDelete(order)}
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        ),
-      },
-    ],
-    [handleDelete]
+      (userRole === "user" || userRole === "admin")
+        ? {
+            name: "ACTIONS",
+            uid: "action",
+            sortable: false,
+            render: (order: any) => (
+              <div style={{ display: "flex", gap: 8 }}>
+                <AddEditOrderForm
+                  initialData={order}
+                  buttonLabel={<Edit size={16} />}
+                />
+                <Button
+                  size="md"
+                  color="error"
+                  auto
+                  aria-label={`Delete ${order.order_id}`}
+                  onClick={() => handleDelete(order)}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
+            ),
+          }
+        : null,
+    ].filter(Boolean) as Column[],
+    [handleDelete, userRole]
   );
   
   useEffect(() => {
@@ -163,7 +178,7 @@ export const Orders = () => {
       >
         <Text h3>All Orders</Text>
         <Flex direction={"row"} css={{ gap: "$6" }} wrap={"wrap"}>
-          {/* <AddEditOrderForm /> */}
+          {userRole === "user" && <AddEditOrderForm />}
         </Flex>
       </Flex>
 
