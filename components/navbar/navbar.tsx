@@ -36,24 +36,50 @@ export const NavbarWrapper = ({children}: Props) => {
             isBordered
             css={{
                'borderBottom': '1px solid $border',
-               'justifyContent': 'space-between',
+               'justifyContent': 'center',
                'width': '100%',
                '@md': {
-                  justifyContent: 'space-between',
+                  justifyContent: 'center',
                },
 
                '& .nextui-navbar-container': {
                   'border': 'none',
                   'maxWidth': '100%',
-
                   'gap': '$6',
                   '@md': {
-                     justifyContent: 'space-between',
+                     justifyContent: 'center',
                   },
                },
             }}
          >
-            <Navbar.Content showIn="md">
+            <Navbar.Content
+               css={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  zIndex: 10,
+                  pointerEvents: 'none',
+               }}
+            >
+               <Text
+                 b
+                 size={20}
+                 css={{
+                   color: '#800000',
+                   letterSpacing: '1px',
+                   fontFamily: 'Poppins, Montserrat, Inter, Arial, sans-serif',
+                   textAlign: 'center',
+                   width: '100%',
+                   userSelect: 'none',
+                   pointerEvents: 'auto',
+                 }}
+               >
+                 Sistem Order CV. Lantana Jaya Digital
+               </Text>
+            </Navbar.Content>
+            <Navbar.Content showIn="md" css={{ alignItems: 'center', gap: '$8' }}>
                <BurguerButton />
             </Navbar.Content>
             <Navbar.Content

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box } from "../styles/box";
 import { Sidebar } from "./sidebar.styles";
 import { Avatar, Tooltip } from "@nextui-org/react";
@@ -27,6 +27,25 @@ import { DeleteIcon } from '../icons/table/delete-icon';
 export const SidebarWrapper = () => {
   const router = useRouter();
   const { collapsed, setCollapsed } = useSidebarContext();
+  const [userRole, setUserRole] = useState<string>("");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          setUserRole(JSON.parse(userStr).role || "");
+        } catch {}
+      } else {
+        setUserRole("");
+      }
+    }
+  }, []);
+
+  // Jangan render menu sensitif sebelum userRole diketahui
+  if (userRole === "") {
+    return null; // atau bisa diganti skeleton/sidebar kosong
+  }
 
   return (
     <Box
@@ -53,20 +72,22 @@ export const SidebarWrapper = () => {
               href="/"
             />
             <SidebarMenu title="Main Menu">
-              <SidebarItem
-                isActive={router.pathname === "/accounts"}
-                title="Accounts"
-                icon={<AccountsIcon />}
-                href="accounts"
-              />
-
-              <SidebarItem
-                isActive={router.pathname === "/products"}
-                title="Products"
-                icon={<ProductsIcon />}
-                href="products"
-              />
-
+              {userRole !== 'user' && (
+                <SidebarItem
+                  isActive={router.pathname === "/accounts"}
+                  title="Accounts"
+                  icon={<AccountsIcon />}
+                  href="accounts"
+                />
+              )}
+              {userRole !== 'user' && (
+                <SidebarItem
+                  isActive={router.pathname === "/products"}
+                  title="Products"
+                  icon={<ProductsIcon />}
+                  href="products"
+                />
+              )}
               {/* Tambahan menu Orders */}
               <SidebarItem
                 isActive={router.pathname === "/orders"}
@@ -80,20 +101,20 @@ export const SidebarWrapper = () => {
                 icon={<BalanceIcon />}
                 href="order_items"
               />
-              <SidebarItem
-                isActive={router.pathname === "/paymentmethod"}
-                title="Payment Methods"
-                icon={<CreditCard size={18} />} // ✅ Gunakan komponen yang sudah diimpor
-                href="paymentmethod"
-              />
-
+              {userRole !== 'user' && (
+                <SidebarItem
+                  isActive={router.pathname === "/paymentmethod"}
+                  title="Payment Methods"
+                  icon={<CreditCard size={18} />}
+                  href="paymentmethod"
+                />
+              )}
               <SidebarItem
                 isActive={router.pathname === "/payment_confirmations"}
                 title="Payment Confirmations"
-                icon={<CreditCardIcon size={18} />} // Ganti icon sesuai selera, bisa juga FileCheck, CheckCircle, dll
+                icon={<CreditCardIcon size={18} />}
                 href="/payment_confirmations"
               />
-
             </SidebarMenu>
           </Sidebar.Body>
           <Sidebar.Footer>

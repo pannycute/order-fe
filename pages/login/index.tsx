@@ -22,8 +22,14 @@ export default function Page() {
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", user);
-      const pathAfterLogin = localStorage.getItem("path_after_login");
-      router.push(pathAfterLogin ?? "/");
+
+      const userRole = res.data.data.role;
+      if (userRole === "user") {
+        router.push("/user-dashboard");
+      } else {
+        const pathAfterLogin = localStorage.getItem("path_after_login");
+        router.push(pathAfterLogin ?? "/");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.message || "Login gagal. Periksa kembali data Anda."
