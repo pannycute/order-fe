@@ -1,4 +1,3 @@
-// src/stores/orderStore.ts
 import { create } from "zustand";
 import {
   getAllOrders,
@@ -9,12 +8,14 @@ import {
 } from "../services/ordersService";
 import { handleUnauthorizedError } from "../utils/handleUnauthorizedError";
 
-interface Order {
+export interface Order {
   order_id: number;
   user_id: number;
-  order_date: string; // ISO date format
-  status: string;
+  order_date: string;
+  status: "pending" | "confirmed" | "shipped" | "completed" | "cancelled";
   total_amount: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface OrderStore {
@@ -45,14 +46,14 @@ export const useOrderStore = create<OrderStore>((set) => ({
   loadAll: async (page = 1, limit = 10) => {
     set({ loading: true, error: null });
     try {
-      const res = await getAllOrders(page, limit);
+      const res = await getAllOrders(page, limit); // <== ini fungsi dari services/orderService.ts
       const { data, totalData } = res.data;
       set({ data, totalData, page, limit, loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data?.message || "Error", loading: false });
       handleUnauthorizedError(err);
     }
-  },
+  },  
 
   getOne: async (order_id) => {
     set({ loading: true, error: null });
@@ -60,7 +61,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
       const res = await getOrderById(order_id);
       set({ currentItem: res.data.data, loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data?.message || "Gagal memuat detail", loading: false });
       handleUnauthorizedError(err);
     }
   },
@@ -68,13 +69,14 @@ export const useOrderStore = create<OrderStore>((set) => ({
   addOne: async (payload) => {
     set({ loading: true, error: null });
     try {
-      await createOrder(payload);
-      await useOrderStore.getState().loadAll();
+      await createOrder(payload); // fungsi API kamu
+      await useOrderStore.getState().loadAll(); // <-- ini wajib ada
+      set({ loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data?.message || "Error", loading: false });
       handleUnauthorizedError(err);
     }
-  },
+  },  
 
   updateOne: async (order_id, payload) => {
     set({ loading: true, error: null });
@@ -82,7 +84,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
       await updateOrder(order_id, payload);
       await useOrderStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data?.message || "Gagal mengupdate data", loading: false });
       handleUnauthorizedError(err);
     }
   },
@@ -93,7 +95,7 @@ export const useOrderStore = create<OrderStore>((set) => ({
       await deleteOrder(order_id);
       await useOrderStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data?.message || "Gagal menghapus data", loading: false });
       handleUnauthorizedError(err);
     }
   },

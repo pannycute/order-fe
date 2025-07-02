@@ -118,9 +118,11 @@ export const use[Context]Store = create<[Context]Store>((set) => ({
 
 Buatkan struktur folder dan isi file untuk REST API resource berikut:
 
-Resource/Context: `products`  
-Primary Key: `id`  
-Fields:   
+Resource/Context: `paymentmethod`  
+Primary Key: `payment_method_id`  
+Fields:  payment_method_id int [pk, increment]
+  method_name varchar(100)
+  details text 
 Gunakan base Axios instance dari `@/utils/axiosInstance.ts`  
 Gunakan Zustand untuk state dengan: `data`, `currentItem`, `loading`, `error`, `page`, `limit`, `totalData`  
 Fungsi: loadAll, getOne, addOne, updateOne, deleteOne  

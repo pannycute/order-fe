@@ -1,3 +1,4 @@
+// @/services/paymentmethodService.ts
 import { axiosInstance } from "../utils/axiosInstance";
 
 const baseURL = "/paymentmethods";

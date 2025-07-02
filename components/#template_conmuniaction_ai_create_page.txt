@@ -1,241 +1,32 @@
-/components/[content]/AddEditForm.tsx
-import React, { useState, useEffect } from "react";
-import { Button, Divider, Input, Modal, Text } from "@nextui-org/react";
-import { Flex } from "../styles/flex";
-import { User, useUserStore } from "../../stores/userStore";
-import { Eye, EyeOff } from "lucide-react";
-import InputSelect from "../input/InputSelect";
-import { useToast } from "../toast/ToastProvider";
-
-interface AddEditUserProps {
-  initialData?: User | null;
-  buttonLabel?: any;
-}
-
-const AddEditUserForm: React.FC<AddEditUserProps> = ({
-  initialData = null,
-  buttonLabel,
-}) => {
-  const [visible, setVisible] = useState(false);
-  const isEditMode = !!initialData?.user_id;
-  const { showToast } = useToast();
-
-  const [form, setForm] = useState<Partial<User>>({
-    user_id: undefined,
-    name: "",
-    email: "",
-    role: "user",
-    password: "",
-    oldPassword: "", // untuk edit mode
-    newPassword: "", // untuk edit mode
-  });
-
-  // State untuk toggle visibility password
-  const [showPassword, setShowPassword] = useState(false);
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-
-  const { addOne, updateOne, loading } = useUserStore();
-
-  const handler = () => setVisible(true);
-
-  const closeHandler = () => {
-    setVisible(false);
-    console.log("closed");
-  };
-
-  // Reset form ketika modal dibuka
-  useEffect(() => {
-    if (visible) {
-      if (initialData) {
-        setForm({
-          user_id: initialData.user_id,
-          name: initialData.name || "",
-          email: initialData.email || "",
-          role: initialData.role || "user",
-          oldPassword: "",
-          newPassword: "",
-        });
-      } else {
-        setForm({
-          user_id: undefined,
-          name: "",
-          email: "",
-          role: "user",
-          password: "",
-        });
-      }
-    }
-  }, [visible, initialData]);
-
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    try {
-      if (isEditMode && form.user_id) {
-        await updateOne(form.user_id, form);
-        showToast("Succses update user", "success");
-      } else {
-        await addOne(form);
-        showToast("Succses create user", "success");
-      }
-      closeHandler();
-    } catch (error) {
-      console.error("Error saving user:", error);
-    }
-  };
-
-  return (
-    <div>
-      <Button auto onClick={handler}>
-        {buttonLabel || (isEditMode ? "Edit User" : "Add User")}
-      </Button>
-      <Modal
-        closeButton
-        aria-labelledby="modal-title"
-        width="600px"
-        open={visible}
-        onClose={closeHandler}
-      >
-        <Modal.Header css={{ justifyContent: "start" }}>
-          <Text id="modal-title" h4>
-            {isEditMode ? "Edit User" : "Add New User"}
-          </Text>
-        </Modal.Header>
-        <Divider css={{ my: "$5" }} />
-        <Modal.Body css={{ py: "$10" }}>
-          <Flex
-            direction={"column"}
-            css={{
-              flexWrap: "wrap",
-              gap: "$8",
-              "@lg": { flexWrap: "nowrap", gap: "$12" },
-            }}
-          >
-            <Input
-              label="Full Name"
-              name="name"
-              bordered
-              clearable
-              fullWidth
-              size="lg"
-              placeholder="Enter full name"
-              value={form.name}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="Email"
-              name="email"
-              type="email"
-              clearable
-              bordered
-              fullWidth
-              size="lg"
-              placeholder="Enter email"
-              value={form.email}
-              onChange={handleChange}
-            />
-
-            {/* Role Select */}
-            <InputSelect
-              label="Role"
-              options={[
-                { id: "admin", label: "Admin" },
-                { id: "user", label: "User" },
-              ]}
-              selectedId={form.role ?? null}
-              onChange={(option) => {
-                if (option) {
-                  setForm((prev) => ({ ...prev, role: option.id as string }));
-                }
-              }}
-            />
-
-            {/* Password Fields */}
-            {isEditMode ? (
-              // Edit Mode: Old Password dan New Password
-              <>
-                <Input
-                  label="Old Password"
-                  name="oldPassword"
-                  type={showOldPassword ? "text" : "password"}
-                  bordered
-                  clearable
-                  fullWidth
-                  size="lg"
-                  placeholder="Enter current password"
-                  value={form.oldPassword ?? ""}
-                  onChange={handleChange}
-                />
-
-                <Input
-                  label="New Password"
-                  name="newPassword"
-                  type={showNewPassword ? "text" : "password"}
-                  bordered
-                  clearable
-                  fullWidth
-                  size="lg"
-                  placeholder="Enter new password"
-                  value={form.newPassword ?? ""}
-                  onChange={handleChange}
-                />
-              </>
-            ) : (
-              // Add Mode: Single Password
-              <Input
-                label="Password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                bordered
-                clearable
-                fullWidth
-                size="lg"
-                placeholder="Enter password"
-                value={form.password ?? ""}
-                onChange={handleChange}
-              />
-            )}
-          </Flex>
-        </Modal.Body>
-        <Divider css={{ my: "$5" }} />
-        <Modal.Footer>
-          <Button auto onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving..." : isEditMode ? "Update User" : "Add User"}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
-  );
-};
-
-export default AddEditUserForm;
-
-/components/[content]/index.tsx
+// /component/[content]/index.tsx
+// @/components/[content]/orders/index.tsx
 import { Button, Text } from "@nextui-org/react";
 import Link from "next/link";
 import React, { useEffect, useMemo, useCallback } from "react";
 import { Flex } from "../styles/flex";
 import { TableWrapper, type Column } from "../table/table";
-import AddEditUserForm from "./AddEditUserForm";
-import { useUserStore } from "../../stores/userStore";
+import AddEditOrderForm from "./AddEditForm";
 import { useToast } from "../toast/ToastProvider";
 import { useConfirmationToast } from "../toast/ConfirmationToast";
-import { Edit, Trash2, Eye, HouseIcon, UsersIcon } from "lucide-react";
+import { Edit, Trash2, Eye, HouseIcon, ShoppingCartIcon } from "lucide-react";
 import { Breadcrumbs, Crumb, CrumbLink } from "../breadcrumb/breadcrumb.styled";
+import { useOrderStore } from "../../stores/orderstore";
 
-export const Accounts = () => {
-  const { data, loading, error, totalData, page, limit, loadAll, deleteOne } =
-    useUserStore();
+export const Orders = () => {
+  const {
+    data,
+    loading,
+    error,
+    totalData,
+    page,
+    limit,
+    loadAll,
+    deleteOne,
+  } = useOrderStore();
 
   const { showToast } = useToast();
   const { showToast: showConfirmationToast } = useConfirmationToast();
 
-  // Load data saat pertama kali component mount & jika pagination berubah
   const handleLoadData = useCallback(
     (params: {
       page: number;
@@ -248,19 +39,18 @@ export const Accounts = () => {
     [loadAll]
   );
 
-  const handleDelete = (user: any) => {
+  const handleDelete = (order: any) => {
     showConfirmationToast(
-      `Are you sure you want to delete "${user.name}"? This action cannot be undone`,
+      `Are you sure you want to delete order "${order.order_id}"? This action cannot be undone.`,
       "error",
       {
         confirmLabel: "Delete",
         cancelLabel: "Cancel",
         onConfirm: async () => {
-          await deleteOne(user.user_id);
-          showToast("Succses delete user", "success");
+          await deleteOne(order.order_id);
+          showToast("Success delete order", "success");
         },
         onCancel: () => {
-          // Optional: tambahkan logic jika diperlukan saat cancel
           console.log("Penghapusan dibatalkan");
         },
       }
@@ -270,45 +60,41 @@ export const Accounts = () => {
   const columns: Column[] = useMemo(
     () => [
       {
-        name: "NAME",
-        uid: "name",
+        name: "ORDER ID",
+        uid: "order_id",
         sortable: true,
-        render: (user: any) => (
-          <div>
-            <div style={{ fontWeight: 500 }}>{user.name}</div>
-            <div style={{ fontSize: 12, color: "#666" }}>{user.email}</div>
-          </div>
-        ),
       },
       {
-        name: "ROLE",
-        uid: "role",
+        name: "DATE",
+        uid: "order_date",
         sortable: true,
-        render: (user: any) => (
-          <div>
-            <div style={{ fontWeight: 500 }}>{user.role}</div>
-          </div>
-        ),
+      },
+      {
+        name: "STATUS",
+        uid: "status",
+        sortable: true,
+      },
+      {
+        name: "TOTAL AMOUNT",
+        uid: "total_amount",
+        sortable: true,
       },
       {
         name: "ACTIONS",
         uid: "action",
         sortable: false,
-        render: (user: any) => (
+        render: (order: any) => (
           <div style={{ display: "flex", gap: 8 }}>
-            {/* <Button size="md" auto aria-label={`View details for ${user.name}`}>
-              <Eye size={16} />
-            </Button> */}
-            <AddEditUserForm
-              initialData={user}
+            <AddEditOrderForm
+              initialData={order}
               buttonLabel={<Edit size={16} />}
             />
             <Button
               size="md"
               color="error"
               auto
-              aria-label={`Delete ${user.name}`}
-              onClick={() => handleDelete(user)}
+              aria-label={`Delete ${order.order_id}`}
+              onClick={() => handleDelete(order)}
             >
               <Trash2 size={16} />
             </Button>
@@ -347,8 +133,8 @@ export const Accounts = () => {
           <Text>/</Text>
         </Crumb>
         <Crumb>
-          <UsersIcon />
-          <CrumbLink href="#">Users</CrumbLink>
+          <ShoppingCartIcon />
+          <CrumbLink href="#">Orders</CrumbLink>
           <Text>/</Text>
         </Crumb>
         <Crumb>
@@ -364,9 +150,9 @@ export const Accounts = () => {
         justify={"between"}
         wrap={"wrap"}
       >
-        <Text h3>All Accounts</Text>
+        <Text h3>All Orders</Text>
         <Flex direction={"row"} css={{ gap: "$6" }} wrap={"wrap"}>
-          <AddEditUserForm />
+          <AddEditOrderForm />
         </Flex>
       </Flex>
 
@@ -379,10 +165,9 @@ export const Accounts = () => {
         limitOptions={[5, 10, 15, 25]}
         defaultLimit={limit}
         defaultPage={page}
-        defaultSortField="name"
+        defaultSortField="order_id"
         defaultSortDirection="asc"
-        ariaLabel="Users management table"
-        // selectionMode="multiple"
+        ariaLabel="Orders management table"
         showLimitSelector={true}
         showPagination={true}
         showSorting={false}
@@ -391,21 +176,571 @@ export const Accounts = () => {
   );
 };
 
+// /component/[content]/AddEditForm.tsx
+// @/components/[content]/orders/AddEditForm.tsx
+import React, { useState, useEffect } from "react";
+import { Button, Divider, Input, Modal, Text } from "@nextui-org/react";
+import { Flex } from "../styles/flex";
+import InputSelect from "../input/InputSelect";
+import { useToast } from "../toast/ToastProvider";
+import { Order, useOrderStore } from "../../stores/orderstore";
+import { axiosInstance } from "../../utils/axiosInstance";
+
+interface AddEditOrderProps {
+  initialData?: Order | null;
+  buttonLabel?: any;
+}
+
+const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
+  initialData = null,
+  buttonLabel,
+}) => {
+  const [visible, setVisible] = useState(false);
+  const isEditMode = !!initialData?.order_id;
+  const [userOptions, setUserOptions] = useState([])
+  const { showToast } = useToast();
+  const [form, setForm] = useState<Partial<Order>>({
+    order_id: undefined,
+    user_id: undefined,
+    order_date: "",
+    status: "pending",
+    total_amount: undefined,
+    created_at: "",
+    updated_at: "",
+  });
+
+  const { addOne, updateOne, loading } = useOrderStore();
+
+  const handler = () => setVisible(true);
+  const closeHandler = () => {
+    setVisible(false);
+    console.log("closed");
+  };
+
+  // Reset form ketika modal dibuka
+  useEffect(() => {
+    if (visible) {
+      if (initialData) {
+        setForm({
+          order_id: initialData.order_id || undefined,
+          user_id: initialData.user_id || undefined,
+          order_date: initialData.order_date || "",
+          status: initialData.status || "panding",
+          total_amount: initialData.total_amount || 0,
+          created_at: initialData.created_at || "",
+          updated_at: initialData.updated_at || "",
+        });
+      } else {
+        setForm({
+            order_id: undefined,
+            user_id: undefined,
+            order_date: "",
+            status: "pending",
+            total_amount: undefined,
+            created_at: "",
+            updated_at: "",
+        });
+      }
+    }
+  }, [visible, initialData]);
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const fetchUserOptions = async (query: string): Promise<any[]> => {
+    try {
+      const res = await axiosInstance.get("/users", {
+        params: {
+          name: query,
+          limit: 10,
+          page: 1,
+        },
+      });
+      const users = res.data.data.map((item: any) => ({
+        id: item.user_id,
+        label: `${item.name}`,
+      }));
+
+      setUserOptions(users)
+      return users
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      return []
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (isEditMode && form.order_id) {
+        await updateOne(form.order_id, form);
+        showToast("Success update order", "success");
+      } else {
+        await addOne(form);
+        showToast("Success create order", "success");
+      }
+      closeHandler();
+    } catch (error: any) {
+      const message =
+        error.response?.data?.message || "An unexpected error occurred";
+      showToast(message, "error");
+    }
+  };
+
+  return (
+    <div>
+      <Button auto onClick={handler}>
+        {buttonLabel || (isEditMode ? "Edit Order" : "Add Order")}
+      </Button>
+      <Modal
+        closeButton
+        aria-labelledby="modal-title"
+        width="600px"
+        open={visible}
+        onClose={closeHandler}
+      >
+        <Modal.Header css={{ justifyContent: "start" }}>
+          <Text id="modal-title" h4>
+            {isEditMode ? "Edit Order" : "Add New Order"}
+          </Text>
+        </Modal.Header>
+        <Divider css={{ my: "$5" }} />
+        <Modal.Body css={{ py: "$10" }}>
+          <Flex
+            direction={"column"}
+            css={{
+              flexWrap: "wrap",
+              gap: "$8",
+              "@lg": { flexWrap: "nowrap", gap: "$12" },
+            }}
+          >
+
+            <InputSelect
+              label="User"
+              options={userOptions}
+              onSearch={fetchUserOptions}
+              selectedId={form.user_id ?? null}
+              onChange={(option) =>
+                option &&
+                setForm((prev) => ({ ...prev, user_id: Number(option.id) }))
+              }
+              placeholder="Select User"
+            />
+
+            <Input
+              label="Order Date"
+              name="order_date"
+              type="date"
+              clearable
+              bordered
+              fullWidth
+              size="lg"
+              placeholder="Enter order date"
+              value={form.order_date}
+              onChange={handleChange}
+            />
+
+            <Input
+              label="Status"
+              name="status"
+              clearable
+              bordered
+              fullWidth
+              size="lg"
+              placeholder="Enter status"
+              value={form.status}
+              onChange={handleChange}
+            />
+
+            <Input
+              label="Total Amount"
+              name="total_amount"
+              type="number"
+              clearable
+              bordered
+              fullWidth
+              size="lg"
+              placeholder="Enter total amount"
+              value={form.total_amount}
+              onChange={handleChange}
+            />
+          </Flex>
+        </Modal.Body>
+        <Divider css={{ my: "$5" }} />
+        <Modal.Footer>
+          <Button auto onClick={handleSubmit} disabled={loading}>
+            {loading ? "Saving..." : isEditMode ? "Update Order" : "Add Order"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+};
+
+export default AddEditOrderForm;
+
+// @/component/input/InputSelect.tsx
+// components/InputSelect.tsx
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { Input, Text, useTheme } from "@nextui-org/react";
+import { useTheme as useNextTheme } from "next-themes";
+import debounce from "lodash.debounce";
+
+interface Option {
+  id: string | number;
+  label: string;
+}
+
+type InputSelectProps = {
+  options?: Option[];
+  onSearch?: (query: string) => Promise<Option[]>;
+  selectedId: string | number | null;
+  onChange: (option: Option | null) => void;
+  placeholder?: string;
+  label?: string;
+};
+
+const InputSelect: React.FC<InputSelectProps> = ({
+  options = [],
+  onSearch,
+  selectedId,
+  onChange,
+  placeholder = "Pilih...",
+  label,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [searchResults, setSearchResults] = useState<Option[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // NextUI theme hooks
+  const { theme } = useTheme();
+  const { theme: nextTheme } = useNextTheme();
+
+  // Refs untuk menangani click outside
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Cari opsi berdasarkan input
+  const handleSearch = useCallback(
+    debounce(async (query: string) => {
+      if (!onSearch) return;
+
+      setIsLoading(true);
+      try {
+        const results = await onSearch(query);
+        setSearchResults(results);
+      } catch (err) {
+        console.error("Error searching:", err);
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }, 500),
+    [onSearch]
+  );
+
+  // Update input dan trigger pencarian
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+
+    if (!isOpen) {
+      setIsOpen(true);
+    }
+
+    if (onSearch) {
+      handleSearch(value);
+    }
+  };
+
+  // Handle focus
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  };
+
+  // Handle blur dengan delay untuk menghindari race condition
+  const handleInputBlur = (e: React.FocusEvent) => {
+    // Cek apakah focus pindah ke dalam dropdown
+    setTimeout(() => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(document.activeElement)
+      ) {
+        setIsOpen(false);
+      }
+    }, 150);
+  };
+
+  // Pilih opsi
+  const handleOptionClick = (option: Option) => {
+    setInputValue(option.label);
+    onChange(option);
+    setIsOpen(false);
+  };
+
+  // Handle click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [isOpen]);
+
+  // Tampilkan label dari ID terpilih
+  useEffect(() => {
+    if (selectedId !== null) {
+      const allOptions = onSearch ? [...searchResults, ...options] : options;
+      const selected = allOptions.find((opt) => opt.id === selectedId);
+      if (selected) {
+        setInputValue(selected.label);
+      }
+    } else {
+      if (!isOpen) {
+        // Jangan clear saat sedang typing
+        setInputValue("");
+      }
+    }
+  }, [selectedId, options]);
+
+  // Initialize search results with static options
+  useEffect(() => {
+    if (onSearch && options.length > 0) {
+      setSearchResults(options);
+    }
+  }, [options, onSearch]);
+
+  useEffect(() => {
+    if(onSearch) onSearch("")
+  }, [])
+
+  const displayOptions = onSearch ? searchResults : options;
+
+  // Dynamic theme colors
+  const isDark = nextTheme === "dark";
+  const dropdownStyles = {
+    position: "absolute" as const,
+    top: "100%",
+    left: 0,
+    right: 0,
+    maxHeight: "200px",
+    overflowY: "auto" as const,
+    zIndex: 1000,
+    marginTop: "4px",
+    backgroundColor: isDark
+      ? theme?.colors?.backgroundContrast?.value || "#18181b"
+      : theme?.colors?.background?.value || "#ffffff",
+    border: `1px solid ${
+      isDark
+        ? theme?.colors?.border?.value || "#27272a"
+        : theme?.colors?.border?.value || "#e4e4e7"
+    }`,
+    borderRadius: theme?.radii?.lg?.value || "8px",
+    boxShadow: isDark
+      ? "0 4px 12px rgba(0, 0, 0, 0.3)"
+      : "0 4px 12px rgba(0, 0, 0, 0.1)",
+  };
+
+  const optionBaseStyle = {
+    padding: "12px 16px",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "background-color 0.2s ease",
+    color: isDark
+      ? theme?.colors?.text?.value || "#fafafa"
+      : theme?.colors?.text?.value || "#09090b",
+    borderBottom: `1px solid ${
+      isDark
+        ? theme?.colors?.border?.value || "#27272a"
+        : theme?.colors?.border?.value || "#f4f4f5"
+    }`,
+  };
+
+  const getOptionStyle = (isSelected: boolean, isHovered: boolean = false) => ({
+    ...optionBaseStyle,
+    backgroundColor: isSelected
+      ? (isDark
+          ? theme?.colors?.primary?.value || "#006fee"
+          : theme?.colors?.primary?.value || "#006fee") + "20"
+      : isHovered
+      ? isDark
+        ? theme?.colors?.backgroundContrast?.value || "#27272a"
+        : theme?.colors?.gray100?.value || "#f4f4f5"
+      : "transparent",
+  });
+
+  return (
+    <div ref={containerRef} style={{ position: "relative", width: "100%" }}>
+      {label && (
+        <Text size="$sm" css={{ mb: "$4" }}>
+          {label}
+        </Text>
+      )}
+
+      <Input
+        bordered
+        fullWidth
+        placeholder={placeholder}
+        value={inputValue}
+        onChange={handleInputChange as any}
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
+        contentRight={
+          isLoading ? (
+            <Text size="$sm" color="default">
+              Loading...
+            </Text>
+          ) : (
+            <div
+              style={{
+                cursor: "pointer",
+                padding: "0 8px",
+                display: "flex",
+                alignItems: "center",
+                color: isDark
+                  ? theme?.colors?.text?.value || "#a1a1aa"
+                  : theme?.colors?.text?.value || "#71717a",
+              }}
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                style={{
+                  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                  transition: "transform 0.2s ease",
+                }}
+              >
+                <polyline points="6,9 12,15 18,9"></polyline>
+              </svg>
+            </div>
+          )
+        }
+      />
+
+      {isOpen && (
+        <div ref={dropdownRef} style={dropdownStyles}>
+          {displayOptions.length === 0 ? (
+            <div
+              style={{
+                padding: "12px 16px",
+                color: isDark
+                  ? theme?.colors?.accents6?.value || "#71717a"
+                  : theme?.colors?.accents6?.value || "#71717a",
+                textAlign: "center",
+                fontSize: "14px",
+              }}
+            >
+              {isLoading ? "Mencari..." : "Tidak ada hasil"}
+            </div>
+          ) : (
+            displayOptions.map((option) => (
+              <DropdownOption
+                key={option.id}
+                option={option}
+                isSelected={selectedId === option.id}
+                onClick={handleOptionClick}
+                theme={theme}
+                isDark={isDark}
+              />
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Separate component untuk dropdown option
+const DropdownOption: React.FC<{
+  option: Option;
+  isSelected: boolean;
+  onClick: (option: Option) => void;
+  theme: any;
+  isDark: boolean;
+}> = ({ option, isSelected, onClick, theme, isDark }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const optionBaseStyle = {
+    padding: "12px 16px",
+    cursor: "pointer",
+    fontSize: "14px",
+    transition: "background-color 0.2s ease",
+    color: isDark
+      ? theme?.colors?.text?.value || "#fafafa"
+      : theme?.colors?.text?.value || "#09090b",
+    borderBottom: `1px solid ${
+      isDark
+        ? theme?.colors?.border?.value || "#27272a"
+        : theme?.colors?.border?.value || "#f4f4f5"
+    }`,
+  };
+
+  const getOptionStyle = (isSelected: boolean, isHovered: boolean = false) => ({
+    ...optionBaseStyle,
+    backgroundColor: isSelected
+      ? (isDark
+          ? theme?.colors?.primary?.value || "#006fee"
+          : theme?.colors?.primary?.value || "#006fee") + "20"
+      : isHovered
+      ? isDark
+        ? theme?.colors?.backgroundContrast?.value || "#27272a"
+        : theme?.colors?.gray100?.value || "#f4f4f5"
+      : "transparent",
+  });
+
+  return (
+    <div
+      onMouseDown={(e) => {
+        e.preventDefault(); // Prevent blur event
+        onClick(option);
+      }}
+      style={getOptionStyle(isSelected, isHovered)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {option.label}
+    </div>
+  );
+};
+
+export default InputSelect;
 
 Buatkan struktur folder dan isi file untuk tampilan page dari content:
 
-Content = products
-Primary key = products_id
-Field = 
-Enpoint Select Input 1 (optional) = 
-Params Filter Select Input 1 (Optional) = 
-Enpoint Select Input 2 (optional) = 
-Params Filter Select Input 1 (Optional) = 
+Content = payment_confirmations 
+Primary key = confirmations_id
+Teble Field = order_id, product_id, quantity, unit_price
+Input Field = order_item_id, order_id, product_id, quantity, unit_price, subtotal
+Enpoint Select Input 1 = /order_id
+Params Filter Select Input 1 = order
+Label field and value Input 1 = order_id, id
+Enpoint Select Input 2 = /product_id
+Params Filter Select Input 2 = product
+Label field and value Input 2 = product_id, id
 
 Jika ada Select Input gunakan InputSelect component dan data akan di ambil dari api.
-Setiap request api akan menggunakan axiosInstance dari "@/utils/axiosInstance"
-Data dari response success api di response.data.data 
+Setiap request api akan menggunakan axiosInstance dari "@/utils/axiosInstance".
+Setiap content sudah memilih store dan itu konsisten jadi gunakan saja di "@/stores/[content]Store".
+Setiap penggunaan select input akan menggunakan "@/component/input/InputSelect.tsx" ini sudah ada di contoh
+Data dari response success api di response.data.data
 Data dari response error api di err.response.data.message
-Gunakan block try-catch untuk handling function API 
-Setiap content sudah memilih store dan itu konsisten jadi gunakan saja di "@/stores/[content]Store"
-Buat 2 File index.tsx dan AddEditForm.tsx, sesuai dengan contoh di atas.
+Gunakan block try-catch untuk handling function API
+Gunakan tambahan limit dan page pada params request select input.
+Buat 2 File index.tsx dan AddEditForm.tsx, sesuai dengan contoh di atas.

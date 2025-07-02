@@ -134,10 +134,14 @@ const InputSelect: React.FC<InputSelectProps> = ({
 
   // Initialize search results with static options
   useEffect(() => {
-    if (!onSearch && options.length > 0) {
+    if (onSearch && options.length > 0) {
       setSearchResults(options);
     }
   }, [options, onSearch]);
+
+  useEffect(() => {
+    if(onSearch) onSearch("")
+  }, [])
 
   const displayOptions = onSearch ? searchResults : options;
 
@@ -207,7 +211,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
         fullWidth
         placeholder={placeholder}
         value={inputValue}
-        onChange={handleInputChange}
+        onChange={handleInputChange as any}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
         contentRight={

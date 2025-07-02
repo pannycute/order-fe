@@ -21,6 +21,8 @@ import { FilterIcon } from "../icons/sidebar/filter-icon";
 import { useSidebarContext } from "../layout/layout-context";
 import { ChangeLogIcon } from "../icons/sidebar/changelog-icon";
 import { useRouter } from "next/router";
+import { CreditCard, CreditCardIcon } from "lucide-react"; // ✅ Import icon
+import { DeleteIcon } from '../icons/table/delete-icon';
 
 export const SidebarWrapper = () => {
   const router = useRouter();
@@ -64,8 +66,67 @@ export const SidebarWrapper = () => {
                 icon={<ProductsIcon />}
                 href="products"
               />
+
+              {/* Tambahan menu Orders */}
+              <SidebarItem
+                isActive={router.pathname === "/orders"}
+                title="Orders"
+                icon={<PaymentsIcon />}
+                href="orders"
+              />
+              <SidebarItem
+                isActive={router.pathname === "/order_items"}
+                title="Order Items"
+                icon={<BalanceIcon />}
+                href="order_items"
+              />
+              <SidebarItem
+                isActive={router.pathname === "/paymentmethod"}
+                title="Payment Methods"
+                icon={<CreditCard size={18} />} // ✅ Gunakan komponen yang sudah diimpor
+                href="paymentmethod"
+              />
+
+              <SidebarItem
+                isActive={router.pathname === "/payment_confirmations"}
+                title="Payment Confirmations"
+                icon={<CreditCardIcon size={18} />} // Ganti icon sesuai selera, bisa juga FileCheck, CheckCircle, dll
+                href="/payment_confirmations"
+              />
+
             </SidebarMenu>
           </Sidebar.Body>
+          <Sidebar.Footer>
+            <button
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                background: 'none',
+                border: 'none',
+                color: '#dc2626',
+                padding: '12px 24px',
+                cursor: 'pointer',
+                fontWeight: 500,
+                fontSize: 16,
+                gap: 12,
+              }}
+              onClick={async () => {
+                try {
+                  await import('../../utils/axiosInstance').then(({ axiosInstance }) => axiosInstance.post('/api/logout'));
+                } catch (err) {
+                  // Optional: handle error
+                } finally {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  router.push('/login');
+                }
+              }}
+            >
+              <DeleteIcon size={20} fill="#dc2626" />
+              Logout
+            </button>
+          </Sidebar.Footer>
         </Flex>
       </Sidebar>
     </Box>

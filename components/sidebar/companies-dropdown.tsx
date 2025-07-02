@@ -14,8 +14,8 @@ interface Company {
 
 export const CompaniesDropdown = () => {
    const [company, setCompany] = useState<Company>({
-      name: 'Acme Co.',
-      location: 'Palo Alto, CA',
+      name: 'CV. Lantana Digital',
+      location: 'Karanganyar, Jawa Tengah',
       logo: <AcmeIcon />,
    });
    return (
@@ -76,8 +76,8 @@ export const CompaniesDropdown = () => {
                }
                if (e === '4') {
                   setCompany({
-                     name: 'Acme Co.',
-                     location: 'Palo Alto, CA',
+                     name: 'CV.Lantana Jaya Digital',
+                     location: 'Karanganyar, Jawa Tengah',
                      logo: <AcmeIcon />,
                   });
                }

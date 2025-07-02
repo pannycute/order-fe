@@ -9,7 +9,7 @@ import {
 } from "../services/orderItemsService";
 import { handleUnauthorizedError } from "../utils/handleUnauthorizedError";
 
-interface OrderItem {
+export interface OrderItem {
   order_item_id: number;
   order_id: number;
   product_id: number;

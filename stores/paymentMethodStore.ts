@@ -1,3 +1,4 @@
+// @/stores/paymentmethodStore.ts
 import { create } from "zustand";
 import {
   getAllPaymentMethods,
@@ -6,12 +7,11 @@ import {
   updatePaymentMethod,
   deletePaymentMethod,
 } from "../services/paymentMethodService";
-import { handleUnauthorizedError } from "../utils/handleUnauthorizedError";
 
-interface PaymentMethod {
+export interface PaymentMethod {
   payment_method_id: number;
   method_name: string;
-  details: string;
+  details: string | null;
 }
 
 interface PaymentMethodStore {
@@ -46,8 +46,9 @@ export const usePaymentMethodStore = create<PaymentMethodStore>((set) => ({
       const { data, totalData } = res.data;
       set({ data, totalData, page, limit, loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
-      handleUnauthorizedError(err);
+      const message =
+        err.response?.data?.message || "Failed to fetch payment methods";
+      set({ error: message, loading: false });
     }
   },
 
@@ -57,8 +58,9 @@ export const usePaymentMethodStore = create<PaymentMethodStore>((set) => ({
       const res = await getPaymentMethodById(id);
       set({ currentPaymentMethod: res.data.data, loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
-      handleUnauthorizedError(err);
+      const message =
+        err.response?.data?.message || "Failed to fetch payment method";
+      set({ error: message, loading: false });
     }
   },
 
@@ -68,8 +70,9 @@ export const usePaymentMethodStore = create<PaymentMethodStore>((set) => ({
       await createPaymentMethod(payload);
       await usePaymentMethodStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
-      handleUnauthorizedError(err);
+      const message =
+        err.response?.data?.message || "Failed to create payment method";
+      set({ error: message, loading: false });
     }
   },
 
@@ -79,8 +82,9 @@ export const usePaymentMethodStore = create<PaymentMethodStore>((set) => ({
       await updatePaymentMethod(id, payload);
       await usePaymentMethodStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
-      handleUnauthorizedError(err);
+      const message =
+        err.response?.data?.message || "Failed to update payment method";
+      set({ error: message, loading: false });
     }
   },
 
@@ -90,8 +94,9 @@ export const usePaymentMethodStore = create<PaymentMethodStore>((set) => ({
       await deletePaymentMethod(id);
       await usePaymentMethodStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
-      handleUnauthorizedError(err);
+      const message =
+        err.response?.data?.message || "Failed to delete payment method";
+      set({ error: message, loading: false });
     }
   },
 }));

@@ -1,8 +1,26 @@
 import {Avatar, Dropdown, Navbar, Text} from '@nextui-org/react';
-import React from 'react';
+import React, { Key } from 'react';
 import {DarkModeSwitch} from './darkmodeswitch';
+import { useRouter } from 'next/router';
+import { axiosInstance } from '../../utils/axiosInstance';
 
 export const UserDropdown = () => {
+   const router = useRouter();
+
+   const handleAction = async (key: Key) => {
+      if (String(key) === 'logout') {
+         try {
+            await axiosInstance.post('/api/logout');
+         } catch (err) {
+            // Optional: handle error, e.g., show toast
+         } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            router.push('/login');
+         }
+      }
+   };
+
    return (
       <Dropdown placement="bottom-right">
          <Navbar.Item>
@@ -18,7 +36,7 @@ export const UserDropdown = () => {
          </Navbar.Item>
          <Dropdown.Menu
             aria-label="User menu actions"
-            onAction={(actionKey) => console.log({actionKey})}
+            onAction={handleAction}
          >
             <Dropdown.Item key="profile" css={{height: '$18'}}>
                <Text b color="inherit" css={{d: 'flex'}}>
