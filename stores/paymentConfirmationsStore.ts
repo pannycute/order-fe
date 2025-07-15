@@ -1,14 +1,6 @@
 import { create } from "zustand";
-import { getAllPaymentConfirmations, getPaymentConfirmationById } from "../services/paymentConfirmationsService";
-
-export interface PaymentConfirmation {
-  confirmation_id: number;
-  order_id: number;
-  product_id: number;
-  quantity: number;
-  unit_price: number;
-  subtotal: number;
-}
+import { getAllPaymentConfirmations, getPaymentConfirmationById, confirmPayment, rejectPayment } from "../services/paymentConfirmationsService";
+import { PaymentConfirmation } from "../types";
 
 interface Store {
   data: PaymentConfirmation[];
@@ -21,6 +13,8 @@ interface Store {
 
   loadAll: (page?: number, limit?: number) => Promise<void>;
   getOne: (id: number) => Promise<void>;
+  confirmPayment: (id: number) => Promise<void>;
+  rejectPayment: (id: number) => Promise<void>;
 }
 
 export const usePaymentConfirmationStore = create<Store>((set) => ({
@@ -50,6 +44,32 @@ export const usePaymentConfirmationStore = create<Store>((set) => ({
       set({ currentConfirmation: res.data.data, loading: false });
     } catch (err: any) {
       set({ error: err.response?.data?.message || "Failed to load detail", loading: false });
+    }
+  },
+
+  confirmPayment: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await confirmPayment(id);
+      // Reload data after confirmation
+      const res = await getAllPaymentConfirmations(1, 10);
+      const { data, totalData } = res.data;
+      set({ data, totalData, loading: false });
+    } catch (err: any) {
+      set({ error: err.response?.data?.message || "Failed to confirm payment", loading: false });
+    }
+  },
+
+  rejectPayment: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      await rejectPayment(id);
+      // Reload data after rejection
+      const res = await getAllPaymentConfirmations(1, 10);
+      const { data, totalData } = res.data;
+      set({ data, totalData, loading: false });
+    } catch (err: any) {
+      set({ error: err.response?.data?.message || "Failed to reject payment", loading: false });
     }
   },
 }));

@@ -10,6 +10,8 @@ import { useConfirmationToast } from "../toast/ConfirmationToast";
 import { Edit, Trash2, Eye, HouseIcon, ShoppingCartIcon } from "lucide-react";
 import { Breadcrumbs, Crumb, CrumbLink } from "../breadcrumb/breadcrumb.styled";
 import { useOrderStore } from "../../stores/orderstore";
+import { useOrderItemStore } from '../../stores/orderItemStore';
+import { useProductStore } from '../../stores/productStore';
 
 export const Orders = () => {
   const {
@@ -28,9 +30,12 @@ export const Orders = () => {
 
   const [userRole, setUserRole] = useState<string>("");
 
+  const orderItemStore = useOrderItemStore();
+  const productStore = useProductStore();
+
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const userStr = localStorage.getItem("user");
+      const userStr = localStorage.getItem("user_data");
       if (userStr) {
         try {
           setUserRole(JSON.parse(userStr).role || "");
@@ -38,6 +43,16 @@ export const Orders = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    orderItemStore.loadAll(1, 1000);
+    productStore.loadAll(1, 1000);
+  }, [orderItemStore, productStore]);
+
+  useEffect(() => {
+    console.log('OrderItemStore:', orderItemStore.data);
+    console.log('OrderStore:', data);
+  }, [orderItemStore.data, data]);
 
   const handleLoadData = useCallback(
     (params: {
@@ -51,7 +66,7 @@ export const Orders = () => {
     [loadAll]
   );
 
-  const handleDelete = (order: any) => {
+  const handleDelete = useCallback((order: any) => {
     showConfirmationToast(
       `Are you sure you want to delete order "${order.order_id}"? This action cannot be undone.`,
       "error",
@@ -67,7 +82,7 @@ export const Orders = () => {
         },
       }
     );
-  };
+  }, [showConfirmationToast, deleteOne, showToast]);
 
   const columns: Column[] = useMemo(
     () => [
@@ -94,37 +109,63 @@ export const Orders = () => {
         name: "TOTAL AMOUNT",
         uid: "total_amount",
         sortable: true,
-        render: (order: any) => order.total_amount?.toLocaleString("id-ID", {
-          style: "currency",
-          currency: "IDR",
-        }) ?? "-",
+        render: (order: any) => {
+          if (order.total_amount === null || order.total_amount === undefined || order.total_amount === '') {
+            return '0';
+          }
+          const num = Number(order.total_amount);
+          if (isNaN(num)) return '-';
+          return num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        },
+      },
+      {
+        name: 'PRODUCTS',
+        uid: 'products',
+        sortable: false,
+        render: (order: any) => {
+          const items = orderItemStore.data.filter((item) => item.order_id === order.order_id);
+          console.log('Order:', order.order_id, 'Items:', items);
+          if (items.length === 0) return '-';
+          return (
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+              {items.map((item) => {
+                const product = productStore.data.find((p) => p.product_id === item.product_id);
+                return (
+                  <li key={item.order_item_id}>
+                    {product ? product.name : 'Produk'} x {item.quantity}
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        },
       },
       (userRole === "user" || userRole === "admin")
         ? {
-            name: "ACTIONS",
-            uid: "action",
-            sortable: false,
-            render: (order: any) => (
-              <div style={{ display: "flex", gap: 8 }}>
-                <AddEditOrderForm
-                  initialData={order}
-                  buttonLabel={<Edit size={16} />}
-                />
-                <Button
-                  size="md"
-                  color="error"
-                  auto
-                  aria-label={`Delete ${order.order_id}`}
-                  onClick={() => handleDelete(order)}
-                >
-                  <Trash2 size={16} />
-                </Button>
-              </div>
-            ),
+        name: "ACTIONS",
+        uid: "action",
+        sortable: false,
+        render: (order: any) => (
+          <div style={{ display: "flex", gap: 8 }}>
+            <AddEditOrderForm
+              initialData={order}
+              buttonLabel={<Edit size={16} />}
+            />
+            <Button
+              size="md"
+              color="error"
+              auto
+              aria-label={`Delete ${order.order_id}`}
+              onClick={() => handleDelete(order)}
+            >
+              <Trash2 size={16} />
+            </Button>
+          </div>
+        ),
           }
         : null,
     ].filter(Boolean) as Column[],
-    [handleDelete, userRole]
+    [handleDelete, userRole, orderItemStore.data, productStore.data]
   );
   
   useEffect(() => {
@@ -135,7 +176,7 @@ export const Orders = () => {
     if (error) {
       showToast(error, "error");
     }
-  }, [error]);
+  }, [error, showToast]);
 
   return (
     <Flex

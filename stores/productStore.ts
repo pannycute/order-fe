@@ -7,14 +7,7 @@ import {
   deleteProduct,
 } from "../services/productService";
 import { handleUnauthorizedError } from "../utils/handleUnauthorizedError";
-
-interface Product {
-  product_id: number;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-}
+import { Product } from "../types";
 
 interface ProductStore {
   data: Product[];

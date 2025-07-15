@@ -21,7 +21,7 @@ export const ToastContainer = ({ toasts, removeToast }: ToastProps) => {
       setTimeout(() => removeToast(toast.id), 3000)
     );
     return () => timers.forEach(clearTimeout);
-  }, [toasts]);
+  }, [toasts, removeToast]);
 
   return (
     <div

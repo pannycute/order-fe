@@ -1,0 +1,9 @@
+# Tambahkan routes ini ke file: C:\laragon\www\sistem_order\routes\api.php
+
+# Payment routes
+Route::post('/payment/create', [App\Http\Controllers\PaymentController::class, 'createPayment']);
+Route::post('/webhook/payment', [App\Http\Controllers\PaymentController::class, 'handleWebhook']);
+Route::get('/payment/status/{orderId}', [App\Http\Controllers\PaymentController::class, 'checkPaymentStatus']);
+
+# Pastikan ada import di bagian atas file:
+use App\Http\Controllers\PaymentController; 

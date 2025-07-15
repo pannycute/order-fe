@@ -38,7 +38,7 @@ export const OrderItems = () => {
     [loadAll]
   );
 
-  const handleDelete = (orderItem: any) => {
+  const handleDelete = useCallback((orderItem: any) => {
     showConfirmationToast(
       `Are you sure you want to delete order item "${orderItem.order_item_id}"? This action cannot be undone.`,
       "error",
@@ -54,7 +54,7 @@ export const OrderItems = () => {
         },
       }
     );
-  };
+  }, [showConfirmationToast, deleteOne, showToast]);
 
   const columns: Column[] = useMemo(
     () => [
@@ -134,7 +134,7 @@ export const OrderItems = () => {
     if (error) {
       showToast(error, "error");
     }
-  }, [error]);
+  }, [error, showToast, data]);
 
   return (
     <Flex

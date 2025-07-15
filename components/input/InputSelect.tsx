@@ -41,7 +41,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
 
   // Cari opsi berdasarkan input
   const handleSearch = useCallback(
-    debounce(async (query: string) => {
+    async (query: string) => {
       if (!onSearch) return;
 
       setIsLoading(true);
@@ -54,8 +54,22 @@ const InputSelect: React.FC<InputSelectProps> = ({
       } finally {
         setIsLoading(false);
       }
-    }, 500),
+    },
     [onSearch]
+  );
+
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const debouncedSearch = useCallback(
+    (query: string) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        handleSearch(query);
+      }, 500);
+    },
+    [handleSearch]
   );
 
   // Update input dan trigger pencarian
@@ -68,7 +82,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
     }
 
     if (onSearch) {
-      handleSearch(value);
+      debouncedSearch(value);
     }
   };
 
@@ -141,7 +155,7 @@ const InputSelect: React.FC<InputSelectProps> = ({
 
   useEffect(() => {
     if(onSearch) onSearch("")
-  }, [])
+  }, [onSearch])
 
   const displayOptions = onSearch ? searchResults : options;
 

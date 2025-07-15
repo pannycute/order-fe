@@ -5,6 +5,7 @@ import { Flex } from "../styles/flex";
 import InputSelect from "../input/InputSelect";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { usePaymentConfirmationStore } from "../../stores/paymentConfirmationsStore";
+import { createPaymentConfirmation, updatePaymentConfirmation } from "../../services/paymentConfirmationsService";
 
 export interface ConfirmationForm {
   confirmation_id?: number;
@@ -33,7 +34,7 @@ const AddEditPaymentConfirmationForm: React.FC<Props> = ({
     subtotal: 0,
   });
 
-  const { addOne, updateOne, loading } = usePaymentConfirmationStore();
+  const { loading } = usePaymentConfirmationStore();
   const { showToast } = useToast();
   const [orderOptions, setOrderOptions] = useState([]);
   const [productOptions, setProductOptions] = useState([]);
@@ -109,13 +110,14 @@ const AddEditPaymentConfirmationForm: React.FC<Props> = ({
       const payload = {
         ...form,
         subtotal: (form.quantity || 0) * (form.unit_price || 0),
+        status: 'pending', // force status pending agar validasi backend lolos
       };
 
       if (isEdit && form.confirmation_id) {
-        await updateOne(form.confirmation_id, payload);
+        await updatePaymentConfirmation(form.confirmation_id, payload);
         showToast("Successfully updated", "success");
       } else {
-        await addOne(payload);
+        await createPaymentConfirmation(payload);
         showToast("Successfully created", "success");
       }
       setVisible(false);

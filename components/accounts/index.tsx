@@ -30,7 +30,7 @@ export const Accounts = () => {
     [loadAll]
   );
 
-  const handleDelete = (user: any) => {
+  const handleDelete = useCallback((user: any) => {
     showConfirmationToast(
       `Are you sure you want to delete "${user.name}"? This action cannot be undone`,
       "error",
@@ -47,7 +47,7 @@ export const Accounts = () => {
         },
       }
     );
-  };
+  }, [showConfirmationToast, deleteOne, showToast]);
 
   const columns: Column[] = useMemo(
     () => [
@@ -105,7 +105,7 @@ export const Accounts = () => {
     if (error) {
       showToast(error, "error");
     }
-  }, [error]);
+  }, [error, showToast]);
 
   return (
     <Flex

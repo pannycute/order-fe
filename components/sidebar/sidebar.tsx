@@ -21,17 +21,18 @@ import { FilterIcon } from "../icons/sidebar/filter-icon";
 import { useSidebarContext } from "../layout/layout-context";
 import { ChangeLogIcon } from "../icons/sidebar/changelog-icon";
 import { useRouter } from "next/router";
-import { CreditCard, CreditCardIcon } from "lucide-react"; // ✅ Import icon
+import { CreditCard, Receipt } from "lucide-react"; // ✅ Import icon
 import { DeleteIcon } from '../icons/table/delete-icon';
 
 export const SidebarWrapper = () => {
   const router = useRouter();
   const { collapsed, setCollapsed } = useSidebarContext();
   const [userRole, setUserRole] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const userStr = localStorage.getItem("user");
+      const userStr = localStorage.getItem("user_data");
       if (userStr) {
         try {
           setUserRole(JSON.parse(userStr).role || "");
@@ -39,12 +40,13 @@ export const SidebarWrapper = () => {
       } else {
         setUserRole("");
       }
+      setIsLoading(false);
     }
   }, []);
 
-  // Jangan render menu sensitif sebelum userRole diketahui
-  if (userRole === "") {
-    return null; // atau bisa diganti skeleton/sidebar kosong
+  // Tampilkan sidebar minimal untuk user yang belum login
+  if (isLoading) {
+    return null;
   }
 
   return (
@@ -68,27 +70,55 @@ export const SidebarWrapper = () => {
             <SidebarItem
               title="Home"
               icon={<HomeIcon />}
-              isActive={router.pathname === "/"}
-              href="/"
+              isActive={
+                (userRole === "user" && router.pathname === "/user-dashboard") ||
+                (userRole === "admin" && router.pathname === "/admin-dashboard") ||
+                (!userRole && router.pathname === "/")
+              }
+              href={
+                userRole === "user"
+                  ? "/user-dashboard"
+                  : userRole === "admin"
+                  ? "/admin-dashboard"
+                  : "/"
+              }
             />
+            
             <SidebarMenu title="Main Menu">
-              {userRole !== 'user' && (
+              {/* Menu Products untuk semua user */}
+              {userRole && (
+
+              <SidebarItem
+                isActive={
+                  userRole === 'user'
+                    ? router.pathname === "/user-products"
+                    : router.pathname === "/products"
+                }
+                title="Products"
+                icon={<ProductsIcon />}
+                href={userRole === 'user' ? '/user-products' : 'products'}
+              />
+              )}
+
+              {/* Menu Pesanan Saya untuk user saja */}
+              {userRole === 'user' && (
                 <SidebarItem
-                  isActive={router.pathname === "/accounts"}
-                  title="Accounts"
-                  icon={<AccountsIcon />}
-                  href="accounts"
+                  isActive={router.pathname === '/user-orders'}
+                  title="Pesanan Saya"
+                  icon={<ViewIcon />}
+                  href="/user-orders"
                 />
               )}
-              {userRole !== 'user' && (
-                <SidebarItem
-                  isActive={router.pathname === "/products"}
-                  title="Products"
-                  icon={<ProductsIcon />}
-                  href="products"
-                />
-              )}
-              {/* Tambahan menu Orders */}
+              
+              {/* Menu admin hanya untuk user yang sudah login dan role admin */}
+              {userRole && userRole !== 'user' && (
+                <>
+                  <SidebarItem
+                    isActive={router.pathname === "/accounts"}
+                    title="Accounts"
+                    icon={<AccountsIcon />}
+                    href="accounts"
+                  />
               <SidebarItem
                 isActive={router.pathname === "/orders"}
                 title="Orders"
@@ -101,53 +131,63 @@ export const SidebarWrapper = () => {
                 icon={<BalanceIcon />}
                 href="order_items"
               />
-              {userRole !== 'user' && (
-                <SidebarItem
-                  isActive={router.pathname === "/paymentmethod"}
-                  title="Payment Methods"
-                  icon={<CreditCard size={18} />}
-                  href="paymentmethod"
-                />
-              )}
+              <SidebarItem
+                isActive={router.pathname === "/paymentmethod"}
+                title="Payment Methods"
+                    icon={<CreditCard size={18} />}
+                href="paymentmethod"
+              />
               <SidebarItem
                 isActive={router.pathname === "/payment_confirmations"}
                 title="Payment Confirmations"
-                icon={<CreditCardIcon size={18} />}
+                    icon={<Receipt size={18} />}
                 href="/payment_confirmations"
               />
+                  <SidebarItem
+                    isActive={router.pathname === "/admin-reports"}
+                    title="Laporan"
+                    icon={<ReportsIcon />}
+                    href="/admin-reports"
+                  />
+                </>
+              )}
             </SidebarMenu>
           </Sidebar.Body>
-          <Sidebar.Footer>
-            <button
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                background: 'none',
-                border: 'none',
-                color: '#dc2626',
-                padding: '12px 24px',
-                cursor: 'pointer',
-                fontWeight: 500,
-                fontSize: 16,
-                gap: 12,
-              }}
-              onClick={async () => {
-                try {
-                  await import('../../utils/axiosInstance').then(({ axiosInstance }) => axiosInstance.post('/api/logout'));
-                } catch (err) {
-                  // Optional: handle error
-                } finally {
-                  localStorage.removeItem('token');
-                  localStorage.removeItem('user');
-                  router.push('/login');
-                }
-              }}
-            >
-              <DeleteIcon size={20} fill="#dc2626" />
-              Logout
-            </button>
-          </Sidebar.Footer>
+          
+          {userRole && (
+            <Sidebar.Footer>
+              <button
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  background: 'none',
+                  border: 'none',
+                  color: '#dc2626',
+                  padding: '12px 24px',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  fontSize: 16,
+                  gap: 12,
+                }}
+                onClick={async () => {
+                  try {
+                    await import('../../utils/axiosInstance').then(({ axiosInstance }) => axiosInstance.post('/logout'));
+                  } catch (err) {
+                    console.error('Logout error:', err);
+                    // Optional: handle error
+                  } finally {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    router.push('/');
+                  }
+                }}
+              >
+                <DeleteIcon size={20} fill="#dc2626" />
+                Logout
+              </button>
+            </Sidebar.Footer>
+          )}
         </Flex>
       </Sidebar>
     </Box>

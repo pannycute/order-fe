@@ -5,14 +5,7 @@ import { Flex } from "../styles/flex";
 import { useProductStore } from "../../stores/productStore";
 import { useToast } from "../toast/ToastProvider";
 import InputSelect from "../input/InputSelect";
-
-interface Product {
-  products_id?: number;
-  name: string;
-  price: number;
-  stock: number;
-  description: string;
-}
+import { Product } from "../../types";
 
 interface AddEditProductProps {
   initialData?: Product | null;
@@ -24,16 +17,17 @@ const AddEditProductForm: React.FC<AddEditProductProps> = ({
   buttonLabel,
 }) => {
   const [visible, setVisible] = useState(false);
-  const isEditMode = !!initialData?.products_id;
+  const isEditMode = !!initialData?.product_id;
   const { addOne, updateOne, loading } = useProductStore();
   const { showToast } = useToast();
 
   const [form, setForm] = useState<Product>({
-    products_id: undefined,
+    product_id: undefined,
     name: "",
     price: 0,
     stock: 0,
     description: "",
+    duration: 1,
   });
 
   const handler = () => setVisible(true);
@@ -47,19 +41,21 @@ const AddEditProductForm: React.FC<AddEditProductProps> = ({
     if (visible) {
       if (initialData) {
         setForm({
-          products_id: initialData.products_id,
+          product_id: initialData.product_id,
           name: initialData.name || "",
           price: initialData.price || 0,
           stock: initialData.stock || 0,
           description: initialData.description || "",
+          duration: initialData.duration || 1,
         });
       } else {
         setForm({
-          products_id: undefined,
+          product_id: undefined,
           name: "",
           price: 0,
           stock: 0,
           description: "",
+          duration: 1,
         });
       }
     }
@@ -72,11 +68,12 @@ const AddEditProductForm: React.FC<AddEditProductProps> = ({
 
   const handleSubmit = async () => {
     try {
-      if (isEditMode && form.products_id) {
-        await updateOne(form.products_id, form);
+      if (isEditMode && form.product_id) {
+        await updateOne(form.product_id, form);
         showToast("Successfully updated product", "success");
       } else {
-        await addOne(form);
+        const { product_id, ...payload } = form;
+        await addOne(payload);
         showToast("Successfully created product", "success");
       }
       closeHandler();
@@ -162,6 +159,20 @@ const AddEditProductForm: React.FC<AddEditProductProps> = ({
               size="lg"
               placeholder="Enter product stock"
               value={form.stock.toString()}
+              onChange={handleChange as any}
+            />
+            <Input
+              label="Duration"
+              name="duration"
+              type="number"
+              min="1"
+              step="1"
+              bordered
+              clearable
+              fullWidth
+              size="lg"
+              placeholder="Enter product duration"
+              value={form.duration?.toString() || ""}
               onChange={handleChange as any}
             />
           </Flex>

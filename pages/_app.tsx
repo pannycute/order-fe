@@ -35,13 +35,13 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (typeof window !== "undefined" && !isNoLayout) {
       checkAuthClient();
     }
-  }, [router.pathname]); // tambahkan dependensi agar react aware saat route berubah
+  }, [router.pathname, isNoLayout]); // tambahkan dependensi agar react aware saat route berubah
 
   useEffect(() => {
     if (!isNoLayout) {
       window.localStorage.setItem("path_after_login", router.pathname);
     }
-  }, [router.pathname]);
+  }, [router.pathname, isNoLayout]);
 
   return (
     <NextThemesProvider

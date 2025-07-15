@@ -16,3 +16,6 @@ export const updateOrder = (order_id: number | string, data: any) =>
 
 export const deleteOrder = (order_id: number | string) =>
   axiosInstance.delete(`${baseURL}/${order_id}`);
+
+// New function for users to create orders
+export const createOrderForUser = (data: any) => axiosInstance.post(`/user/orders`, data);

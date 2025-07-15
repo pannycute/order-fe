@@ -22,14 +22,23 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
   const isEditMode = !!initialData?.order_id;
   const [userOptions, setUserOptions] = useState([])
   const { showToast } = useToast();
+  // Ambil user login dari localStorage
+  const getUserFromStorage = () => {
+    if (typeof window === 'undefined') return null;
+    const userStr = localStorage.getItem('user_data');
+    return userStr ? JSON.parse(userStr) : null;
+  };
+  // Default order_date hari ini jika tambah order
+  const today = new Date().toISOString().slice(0, 10);
+  const user = getUserFromStorage();
   const [form, setForm] = useState<Partial<Order>>({
     order_id: undefined,
-    user_id: undefined,
-    order_date: "",
-    status: "pending",
+    user_id: !isEditMode && user && user.role === 'user' ? user.user_id : undefined,
+    order_date: !isEditMode ? today : '',
+    status: 'pending',
     total_amount: undefined,
-    created_at: "",
-    updated_at: "",
+    created_at: '',
+    updated_at: '',
   });
 
   const { addOne, updateOne, loading } = useOrderStore();
@@ -47,7 +56,7 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
         setForm({
           order_id: initialData.order_id || undefined,
           user_id: initialData.user_id || undefined,
-          order_date: initialData.order_date || "",
+          order_date: initialData.order_date || today,
           status: initialData.status || "panding",
           total_amount: initialData.total_amount || 0,
           created_at: initialData.created_at || "",
@@ -56,8 +65,8 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
       } else {
         setForm({
             order_id: undefined,
-            user_id: undefined,
-            order_date: "",
+          user_id: user && user.role === 'user' ? user.user_id : undefined,
+          order_date: today,
             status: "pending",
             total_amount: undefined,
             created_at: "",
@@ -65,7 +74,7 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
         });
       }
     }
-  }, [visible, initialData]);
+  }, [visible, initialData, today, user]);
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -139,6 +148,8 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
             }}
           >
 
+            {/* Jika user login sebagai user, sembunyikan input user */}
+            {!(user && user.role === 'user') && (
             <InputSelect
               label="User"
               options={userOptions}
@@ -150,6 +161,7 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
               }
               placeholder="Select User"
             />
+            )}
 
             <Input
               label="Order Date"
@@ -162,6 +174,7 @@ const AddEditOrderForm: React.FC<AddEditOrderProps> = ({
               placeholder="Enter order date"
               value={form.order_date}
               onChange={handleChange}
+              disabled={user && user.role === 'user'}
             />
 
 <Dropdown>

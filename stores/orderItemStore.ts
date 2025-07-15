@@ -53,7 +53,7 @@ export const useOrderItemStore = create<OrderItemStore>((set) => ({
       const { data, totalData } = res.data;
       set({ data, totalData, page, limit, loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data.message, loading: false });
       handleUnauthorizedError(err);
     }
   },
@@ -64,7 +64,7 @@ export const useOrderItemStore = create<OrderItemStore>((set) => ({
       const res = await getOrderItemById(order_item_id);
       set({ currentItem: res.data.data, loading: false });
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data.message, loading: false });
       handleUnauthorizedError(err);
     }
   },
@@ -75,7 +75,7 @@ export const useOrderItemStore = create<OrderItemStore>((set) => ({
       await createOrderItem(payload);
       await useOrderItemStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data.message, loading: false });
       handleUnauthorizedError(err);
     }
   },
@@ -86,7 +86,7 @@ export const useOrderItemStore = create<OrderItemStore>((set) => ({
       await updateOrderItem(order_item_id, payload);
       await useOrderItemStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data.message, loading: false });
       handleUnauthorizedError(err);
     }
   },
@@ -97,7 +97,7 @@ export const useOrderItemStore = create<OrderItemStore>((set) => ({
       await deleteOrderItem(order_item_id);
       await useOrderItemStore.getState().loadAll();
     } catch (err: any) {
-      set({ error: err.response.data.message, loading: false });
+      set({ error: err.response?.data.message, loading: false });
       handleUnauthorizedError(err);
     }
   },

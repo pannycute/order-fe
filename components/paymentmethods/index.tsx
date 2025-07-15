@@ -38,7 +38,7 @@ export const PaymentMethods = () => {
     [loadAll]
   );
 
-  const handleDelete = (paymentMethod: any) => {
+  const handleDelete = useCallback((paymentMethod: any) => {
     showConfirmationToast(
       `Are you sure you want to delete payment method "${paymentMethod.method_name}"? This action cannot be undone.`,
       "error",
@@ -54,7 +54,7 @@ export const PaymentMethods = () => {
         },
       }
     );
-  };
+  }, [showConfirmationToast, deleteOne, showToast]);
 
   const columns: Column[] = useMemo(
     () => [
@@ -100,7 +100,7 @@ export const PaymentMethods = () => {
     if (error) {
       showToast(error, "error");
     }
-  }, [error]);
+  }, [error, showToast]);
 
   return (
     <Flex

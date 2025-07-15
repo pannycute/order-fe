@@ -17,3 +17,7 @@ export const updatePaymentMethod = (id: number | string, data: any) =>
 
 export const deletePaymentMethod = (id: number | string) =>
   axiosInstance.delete(`${baseURL}/${id}`);
+
+// New function for users to get payment methods (public access)
+export const getPaymentMethodsForUsers = (page = 1, limit = 10) =>
+  axiosInstance.get(`/user/paymentmethods?page=${page}&limit=${limit}`);

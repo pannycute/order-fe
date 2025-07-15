@@ -19,3 +19,9 @@ export const updatePaymentConfirmation = (
 
 export const deletePaymentConfirmation = (confirmation_id: number | string) =>
   axiosInstance.delete(`${baseURL}/${confirmation_id}`);
+
+export const confirmPayment = (confirmation_id: number | string) =>
+  axiosInstance.patch(`${baseURL}/${confirmation_id}/confirm`);
+
+export const rejectPayment = (confirmation_id: number | string) =>
+  axiosInstance.patch(`${baseURL}/${confirmation_id}/reject`);

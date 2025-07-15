@@ -1,27 +1,150 @@
-# NextJS and NextUI Dashboard Sample
+# Sistem Order Management
 
-You can deploy here directly to vercel [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/import/project?template=https://github.com/chris-trapstar/nextui-dashboard)
+Sistem manajemen order dengan Next.js frontend dan Laravel backend.
 
-This is a sample for NextJS and NextUI. 
+## Fitur
 
-[NextJS](https://nextjs.org/) 
-[NextUI](https://nextui.org/)
+### User
+- ✅ Login/Register
+- ✅ Dashboard User
+- ✅ Lihat Produk
+- ✅ Checkout Produk
+- ✅ Lihat Pesanan Saya
+- ✅ Konfirmasi Pembayaran
+- ✅ Perhitungan Tenggat Waktu
 
-You can see the demo here: https://nextui-dashboard.vercel.app/
+### Admin
+- ✅ Dashboard Admin dengan Laporan
+- ✅ Manajemen User
+- ✅ Manajemen Produk
+- ✅ Manajemen Order
+- ✅ Manajemen Payment Methods
+- ✅ Manajemen Payment Confirmations
+- ✅ Laporan Pendapatan
 
-### Dark Mode
-![Dashboard Dark Mode](./public/dark.png)
+## Setup
 
-### Light Mode
-![Dashboard Light Mode](./public/light.png)
+### Frontend (Next.js)
+```bash
+npm install
+npm run dev
+```
 
+### Backend (Laravel)
+```bash
+composer install
+php artisan migrate
+php artisan serve
+```
 
+## Environment Variables
 
-- Dark Mode Support
-- Full Responsive
-- Home Page with Charts
-- Accounts Page
-- More pages coming soon...
+Buat file `.env.local`:
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
+
+## API Endpoints
+
+### Authentication
+- `POST /api/login` - User login
+- `POST /api/logout` - User logout
+- `POST /api/register` - User register
+
+### Products
+- `GET /api/products` - Get all products
+- `POST /api/products` - Create product (admin)
+- `PUT /api/products/{id}` - Update product (admin)
+- `DELETE /api/products/{id}` - Delete product (admin)
+
+### Orders
+- `GET /api/orders` - Get all orders
+- `POST /api/orders` - Create order
+- `PUT /api/orders/{id}` - Update order
+- `DELETE /api/orders/{id}` - Delete order
+
+### Payment Confirmations
+- `GET /api/paymentconfirmations` - Get all confirmations
+- `POST /api/paymentconfirmations` - Create confirmation
+- `PUT /api/paymentconfirmations/{id}` - Update confirmation
+
+### Reports
+- `GET /api/reports/omzet/today` - Today's income
+- `GET /api/reports/omzet/month` - Monthly income
+- `GET /api/reports/omzet/monthly-comparison` - Monthly comparison
+
+## Database Structure
+
+### Users
+- user_id (PK)
+- name
+- email
+- password
+- role (admin/user)
+
+### Products
+- product_id (PK)
+- name
+- description
+- price
+- stock
+- duration (in months)
+
+### Orders
+- order_id (PK)
+- user_id (FK)
+- order_date
+- status
+- total_amount
+
+### Order Items
+- order_item_id (PK)
+- order_id (FK)
+- product_id (FK)
+- quantity
+- unit_price
+- subtotal
+
+### Payment Methods
+- payment_method_id (PK)
+- method_name
+- details
+
+### Payment Confirmations
+- confirmation_id (PK)
+- order_id (FK)
+- user_id (FK)
+- amount
+- bukti_transfer
+- payment_method_id (FK)
+- confirmation_date
+- status
+
+## Features
+
+### Tenggat Waktu Otomatis
+Sistem menghitung tenggat waktu berdasarkan:
+- Tanggal order
+- Durasi produk (dalam bulan)
+- Perhitungan yang akurat untuk semua bulan
+
+### Payment System
+- Upload bukti transfer
+- Status pending → confirmed
+- Verifikasi admin
+
+### Role-based Access
+- User: Lihat produk, checkout, lihat pesanan
+- Admin: Full access semua fitur
+
+## Tech Stack
+
+- **Frontend**: Next.js, TypeScript, NextUI
+- **State Management**: Zustand
+- **HTTP Client**: Axios
+- **Charts**: Recharts
+- **Backend**: Laravel, MySQL
+- **Authentication**: Laravel Sanctum
 
 ```
 ├── components

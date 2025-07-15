@@ -10,13 +10,14 @@ export const UserDropdown = () => {
    const handleAction = async (key: Key) => {
       if (String(key) === 'logout') {
          try {
-            await axiosInstance.post('/api/logout');
+            await axiosInstance.post('/logout');
          } catch (err) {
+            console.error('Logout error:', err);
             // Optional: handle error, e.g., show toast
          } finally {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            router.push('/login');
+                    localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_data');
+            router.push('/');
          }
       }
    };

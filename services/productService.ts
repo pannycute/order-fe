@@ -15,3 +15,7 @@ export const updateProduct = (id: number | string, data: any) =>
 
 export const deleteProduct = (id: number | string) =>
   axiosInstance.delete(`${baseURL}/${id}`);
+
+// New function for users to get products (public access)
+export const getProductsForUsers = (page = 1, limit = 10) =>
+  axiosInstance.get(`/user/products?page=${page}&limit=${limit}`);

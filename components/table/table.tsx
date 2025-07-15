@@ -106,14 +106,7 @@ export const TableWrapper = ({
     if (!showLimitSelector) return null;
 
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          marginTop: "16px",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "16px" }}>
         <span>Show:</span>
         <Dropdown>
           <Dropdown.Trigger>
@@ -140,36 +133,22 @@ export const TableWrapper = ({
     const endItem = Math.min(currentPage * limit, totalItems);
 
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "16px",
-          fontSize: "14px",
-          color: "#666",
-        }}
-      >
-        <span>
-          Showing {startItem} to {endItem} of {totalItems} entries
-        </span>
-        {totalPages > 1 && (
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-        )}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginTop: "16px",
+        fontSize: "14px",
+        color: "#666",
+      }}>
+        <span>Showing {startItem} to {endItem} of {totalItems} entries</span>
+        {totalPages > 1 && <span>Page {currentPage} of {totalPages}</span>}
       </div>
     );
   };
 
   return (
-    <Box
-      css={{
-        "& .nextui-table-container": {
-          boxShadow: "none",
-        },
-      }}
-    >
+    <Box css={{ "& .nextui-table-container": { boxShadow: "none" } }}>
       {renderLimitSelector()}
 
       <Table
@@ -240,12 +219,12 @@ export const TableWrapper = ({
             </Table.Row>
           ) : data.length > 0 ? (
             data.map((item) => (
-              <Table.Row key={item.id || item.uid}>
+              <Table.Row key={item.id || item.uid || item.confirmation_id}>
                 {columns.map((column) => (
                   <Table.Cell key={column.uid}>
                     {column.render
-                      ? column.render(item) // ← gunakan render per kolom jika ada
-                      : "-"}
+                      ? column.render(item)
+                      : item[column.uid] ?? "-"}
                   </Table.Cell>
                 ))}
               </Table.Row>
@@ -274,13 +253,7 @@ export const TableWrapper = ({
       </Table>
 
       {showPagination && totalPages > 1 && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "16px",
-          }}
-        >
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "16px" }}>
           <Pagination
             shadow
             noMargin
@@ -295,44 +268,4 @@ export const TableWrapper = ({
       {renderPaginationInfo()}
     </Box>
   );
-};
-
-export const useTableState = ({
-  defaultPage = 1,
-  defaultLimit = 10,
-  defaultSortField = null,
-  defaultSortDirection = "asc",
-} = {}) => {
-  const [currentPage, setCurrentPage] = useState(defaultPage);
-  const [limit, setLimit] = useState(defaultLimit);
-  const [sortField, setSortField] = useState(defaultSortField);
-  const [sortDirection, setSortDirection] = useState(defaultSortDirection);
-
-  const setSort = (field: any) => {
-    if (sortField === field) {
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-    setCurrentPage(1);
-  };
-
-  const setPage = (page: number) => setCurrentPage(page);
-  const setRowsPerPage = (rows: number) => {
-    setLimit(rows);
-    setCurrentPage(1);
-  };
-
-  return {
-    currentPage,
-    setPage,
-    limit,
-    setRowsPerPage,
-    sortField,
-    sortDirection,
-    setSort,
-    setSortField,
-    setSortDirection,
-  };
 };

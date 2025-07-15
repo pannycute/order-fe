@@ -31,7 +31,7 @@ export const Products = () => {
     [loadAll]
   );
 
-  const handleDelete = (product: any) => {
+  const handleDelete = useCallback((product: any) => {
     showConfirmationToast(
       `Are you sure you want to delete "${product.name}"? This action cannot be undone`,
       "error",
@@ -40,7 +40,7 @@ export const Products = () => {
         cancelLabel: "Cancel",
         onConfirm: async () => {
           try {
-            await deleteOne(product.products_id);
+            await deleteOne(product.product_id);
             showToast("Successfully deleted product", "success");
           } catch (err) {
             console.error("Error deleting product:", err);
@@ -52,7 +52,7 @@ export const Products = () => {
         },
       }
     );
-  };
+  }, [showConfirmationToast, deleteOne, showToast]);
 
   const columns: Column[] = useMemo(
     () => [
@@ -115,7 +115,7 @@ export const Products = () => {
     if (error) {
       showToast(error, "error");
     }
-  }, [error]);
+  }, [error, showToast]);
 
   return (
     <Flex
