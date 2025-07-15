@@ -8,6 +8,7 @@ import {
 } from "@nextui-org/react";
 import { PaymentConfirmation } from "../../types";
 import { CheckCircle, XCircle, Eye } from "lucide-react";
+import { STORAGE_URL } from "../../utils/axiosInstance";
 
 interface PaymentDetailModalProps {
   isOpen: boolean;
@@ -70,8 +71,6 @@ export const PaymentDetailModal: React.FC<PaymentDetailModalProps> = ({
       currency: "IDR",
     }).format(amount);
   };
-
-  const STORAGE_URL = process.env.NEXT_PUBLIC_STORAGE_URL || 'http://localhost:8000/storage';
 
   return (
     <Modal open={isOpen} onClose={onClose}>
