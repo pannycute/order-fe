@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const API_URL = "http://order-space.lantanajayadigital.cloud/api"
-export const STORAGE_URL = "http://order-space.lantanajayadigital.cloud/storage"
+export const API_URL = "https://order-space.lantanajayadigital.cloud/api"
+export const STORAGE_URL = "https://order-space.lantanajayadigital.cloud/storage"
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
