@@ -418,11 +418,6 @@ const Products = () => {
       </div>
 
       {/* Edit/Add Product Modal */}
-      <AddEditProductForm
-        initialData={selectedProduct}
-        buttonLabel={null}
-        // Modal visibility controlled externally
-      />
       <Modal
         open={visible}
         onClose={() => setVisible(false)}

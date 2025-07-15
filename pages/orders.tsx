@@ -103,8 +103,12 @@ const Orders = () => {
 
   // Filter orders berdasarkan search term dan status
   const filteredOrders = orderStore.data.filter(order => {
-    const matchesSearch = order.order_id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.status?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      order.order_id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      getOrderItems(order.order_id).some(item =>
+        getProductName(item.product_id).toLowerCase().includes(searchTerm.toLowerCase())
+      );
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -188,7 +192,9 @@ const Orders = () => {
   };
 
   const getProductName = (productId: number) => {
-    const product = productStore.data.find((p) => p.product_id === productId);
+    const product = productStore.data.find(
+      (p) => String(p.product_id) === String(productId)
+    );
     return product ? product.name : 'Produk tidak ditemukan';
   };
 

@@ -470,11 +470,6 @@ const Accounts = () => {
       </div>
 
       {/* Edit/Add User Modal */}
-      <AddEditUserForm
-        initialData={selectedUser}
-        buttonLabel={null}
-        // Modal visibility controlled externally
-      />
       <Modal
         open={visible}
         onClose={() => setVisible(false)}

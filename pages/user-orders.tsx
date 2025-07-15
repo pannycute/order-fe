@@ -122,7 +122,7 @@ const UserOrders = () => {
   
   if (!user) return null;
 
-  const userOrders = orderStore.data.filter((order) => order.user_id === user.user_id);
+  const userOrders = orderStore.data.filter((order) => String(order.user_id) === String(user.user_id));
 
   return (
     <div style={{ 
@@ -187,6 +187,22 @@ const UserOrders = () => {
               const product = productStore.data.find((p) => p.product_id === item.product_id);
               return { ...item, product };
             });
+            // Tambahkan log debug kecocokan product_id
+            if (typeof window !== 'undefined') {
+              const productIdsInStore = productStore.data.map(p => p.product_id);
+              const productIdsInOrder = orderItems.map(i => i.product_id);
+              const unmatched = productIdsInOrder.filter(id => !productIdsInStore.includes(id));
+              console.log('orderItems:', orderItems);
+              console.log('productStore:', productStore.data);
+              console.log('productIdsInOrder:', productIdsInOrder);
+              console.log('productIdsInStore:', productIdsInStore);
+              if (unmatched.length > 0) {
+                console.warn('product_id berikut dari orderItems tidak ditemukan di productStore:', unmatched);
+              } else {
+                console.log('Semua product_id orderItems ditemukan di productStore');
+              }
+              console.log('products mapped:', products);
+            }
             const statusInfo = getStatusInfo(order.status);
 
             return (
@@ -259,31 +275,29 @@ const UserOrders = () => {
                           padding: '1rem',
                           background: '#f8fafc',
                           borderRadius: '12px',
-                          border: '1px solid #e5e7eb'
+                          border: '1px solid #e5e7eb',
+                          marginBottom: '0.5rem',
                         }}
                       >
                         <div style={{ flex: 1 }}>
                           <Text h6 style={{ color: '#374151', marginBottom: '0.25rem' }}>
-                            {item.product?.name || `Product #${item.product_id}`}
+                            {item.product?.name || `Product #${item.product_id} (Nama tidak ditemukan)`}
                           </Text>
-                          {item.product?.duration && (
-                            <div style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-                              Tenggat: {calculateDeadline(order.order_date, item.product.duration)}
-                            </div>
-                          )}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#6b7280' }}>
-                            <Text size="sm">
-                              Qty: {item.quantity}
-                            </Text>
-                            <Text size="sm">
-                              @ Rp{Number(item.unit_price).toLocaleString('id-ID', { style: 'decimal', maximumFractionDigits: 0 })}
-                            </Text>
+                          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>
+                            {item.product?.description || <span style={{ color: '#b91c1c' }}>Deskripsi tidak tersedia</span>}
+                          </div>
+                          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>
+                            Durasi: {item.product?.duration ? `${item.product.duration} bulan` : <span style={{ color: '#b91c1c' }}>Tidak tersedia</span>}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#6b7280', marginBottom: 4 }}>
+                            <Text size="sm">Qty: {item.quantity}</Text>
+                            <Text size="sm">@ Rp{Number(item.unit_price).toLocaleString('id-ID', { style: 'decimal', maximumFractionDigits: 0 })}</Text>
                           </div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
-                                                     <Text h6 style={{ color: '#800000', fontWeight: 'bold' }}>
-                             Rp{Number(item.subtotal).toLocaleString('id-ID', { style: 'decimal', maximumFractionDigits: 0 })}
-                           </Text>
+                          <Text h6 style={{ color: '#800000', fontWeight: 'bold' }}>
+                            Rp{Number(item.subtotal).toLocaleString('id-ID', { style: 'decimal', maximumFractionDigits: 0 })}
+                          </Text>
                         </div>
                       </div>
                     ))}

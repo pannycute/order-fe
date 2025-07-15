@@ -63,7 +63,10 @@ const AddEditProductForm: React.FC<AddEditProductProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [name]: name === "duration" ? Number(value) : value,
+    }));
   };
 
   const handleSubmit = async () => {

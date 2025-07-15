@@ -132,7 +132,9 @@ const OrderItems = () => {
   };
 
   const getProductName = (productId: number) => {
-    const product = productStore.data.find((p) => p.product_id === productId);
+    const product = productStore.data.find(
+      (p) => String(p.product_id) === String(productId)
+    );
     return product ? product.name : 'Produk tidak ditemukan';
   };
 
