@@ -21,6 +21,7 @@ import {
   Phone
 } from 'lucide-react';
 import { axiosInstance } from '../utils/axiosInstance';
+import AddEditUserForm from "../components/accounts/AddEditUserForm";
 
 const getAdminFromStorage = () => {
   if (typeof window === 'undefined') return null;
@@ -31,14 +32,14 @@ const getAdminFromStorage = () => {
 const Accounts = () => {
   const router = useRouter();
   const userStore = useUserStore();
-  const { setVisible, bindings } = useModal();
+  const [visible, setVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [fadeIn, setFadeIn] = useState(false);
 
   useEffect(() => {
@@ -113,6 +114,10 @@ const Accounts = () => {
     setSelectedUser(user);
     setVisible(true);
   };
+  const openAddModal = () => {
+    setSelectedUser(null);
+    setVisible(true);
+  };
 
   const getInitials = (name: string) => {
     if (!name) return '';
@@ -183,7 +188,7 @@ const Accounts = () => {
                 borderRadius: 12,
                 padding: '12px 24px'
               }}
-              onClick={() => setVisible(true)}
+              onClick={openAddModal}
             >
               <Plus size={20} style={{ marginRight: '0.5rem' }} />
               Tambah Pengguna
@@ -465,86 +470,23 @@ const Accounts = () => {
       </div>
 
       {/* Edit/Add User Modal */}
+      <AddEditUserForm
+        initialData={selectedUser}
+        buttonLabel={null}
+        // Modal visibility controlled externally
+      />
       <Modal
-        scroll
+        open={visible}
+        onClose={() => setVisible(false)}
         width="600px"
         aria-labelledby="modal-title"
-        {...bindings}
       >
-        <Modal.Header>
-          <Text id="modal-title" size={18}>
-            {selectedUser ? 'Edit Pengguna' : 'Tambah Pengguna Baru'}
-          </Text>
-        </Modal.Header>
         <Modal.Body>
-          <div style={{ padding: '1rem' }}>
-            <Text size={14} css={{ color: '#666', marginBottom: '2rem' }}>
-              {selectedUser ? 'Edit informasi pengguna di bawah ini' : 'Isi informasi pengguna baru di bawah ini'}
-            </Text>
-            
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <Input
-                label="Nama Lengkap"
-                placeholder="Masukkan nama lengkap"
-                size="lg"
-                bordered
-                defaultValue={selectedUser?.name || ''}
-              />
-              
-              <Input
-                label="Email"
-                placeholder="Masukkan email"
-                size="lg"
-                bordered
-                type="email"
-                defaultValue={selectedUser?.email || ''}
-              />
-              
-              <Input
-                label="Password"
-                placeholder="Masukkan password"
-                size="lg"
-                bordered
-                type="password"
-                defaultValue={selectedUser?.password || ''}
-              />
-              
-              <Input
-                label="Nomor Telepon"
-                placeholder="Masukkan nomor telepon"
-                size="lg"
-                bordered
-                defaultValue={selectedUser?.phone || ''}
-              />
-              
-              <select
-                defaultValue={selectedUser?.role || 'user'}
-                style={{
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: 12,
-                  fontSize: 14,
-                  backgroundColor: 'white',
-                  color: '#800000',
-                }}
-              >
-                <option value="user">Pengguna</option>
-                <option value="admin">Administrator</option>
-              </select>
-            </div>
-          </div>
+          <AddEditUserForm
+            initialData={selectedUser}
+            buttonLabel={null}
+          />
         </Modal.Body>
-        <Modal.Footer>
-          <Button auto flat color="error" onClick={() => setVisible(false)}>
-            Batal
-          </Button>
-          <Button auto css={{ 
-            background: 'linear-gradient(135deg, #800000 0%, #b91c1c 100%)',
-            color: 'white'
-          }}>
-            {selectedUser ? 'Update Pengguna' : 'Tambah Pengguna'}
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       {/* Footer */}

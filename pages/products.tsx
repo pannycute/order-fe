@@ -22,6 +22,7 @@ import {
   List
 } from 'lucide-react';
 import { axiosInstance } from '../utils/axiosInstance';
+import AddEditProductForm from "../components/products/AddEditForm";
 
 const getAdminFromStorage = () => {
   if (typeof window === 'undefined') return null;
@@ -44,12 +45,12 @@ const formatCurrency = (amount: number) => {
 const Products = () => {
   const router = useRouter();
   const productStore = useProductStore();
-  const { setVisible, bindings } = useModal();
   
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [visible, setVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [fadeIn, setFadeIn] = useState(false);
 
@@ -116,6 +117,10 @@ const Products = () => {
     setSelectedProduct(product);
     setVisible(true);
   };
+  const openAddModal = () => {
+    setSelectedProduct(null);
+    setVisible(true);
+  };
 
   return (
     <div
@@ -163,7 +168,7 @@ const Products = () => {
                 borderRadius: 12,
                 padding: '12px 24px'
               }}
-              onClick={() => setVisible(true)}
+              onClick={openAddModal}
             >
               <Plus size={20} style={{ marginRight: '0.5rem' }} />
               Tambah Produk
@@ -413,80 +418,23 @@ const Products = () => {
       </div>
 
       {/* Edit/Add Product Modal */}
+      <AddEditProductForm
+        initialData={selectedProduct}
+        buttonLabel={null}
+        // Modal visibility controlled externally
+      />
       <Modal
-        scroll
+        open={visible}
+        onClose={() => setVisible(false)}
         width="600px"
         aria-labelledby="modal-title"
-        {...bindings}
       >
-        <Modal.Header>
-          <Text id="modal-title" size={18}>
-            {selectedProduct ? 'Edit Produk' : 'Tambah Produk Baru'}
-          </Text>
-        </Modal.Header>
         <Modal.Body>
-          <div style={{ padding: '1rem' }}>
-            <Text size={14} css={{ color: '#666', marginBottom: '2rem' }}>
-              {selectedProduct ? 'Edit informasi produk di bawah ini' : 'Isi informasi produk baru di bawah ini'}
-            </Text>
-            
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              <Input
-                label="Nama Produk"
-                placeholder="Masukkan nama produk"
-                size="lg"
-                bordered
-                defaultValue={selectedProduct?.name || ''}
-              />
-              
-              <Input
-                label="Harga"
-                placeholder="Masukkan harga"
-                size="lg"
-                bordered
-                type="number"
-                defaultValue={selectedProduct?.price || ''}
-              />
-              
-              <Input
-                label="Stok"
-                placeholder="Masukkan jumlah stok"
-                size="lg"
-                bordered
-                type="number"
-                defaultValue={selectedProduct?.stock || ''}
-              />
-              
-              <Input
-                label="Durasi (Bulan)"
-                placeholder="Masukkan durasi dalam bulan"
-                size="lg"
-                bordered
-                type="number"
-                defaultValue={selectedProduct?.duration || ''}
-              />
-              
-              <Input
-                label="Deskripsi"
-                placeholder="Masukkan deskripsi produk"
-                size="lg"
-                bordered
-                defaultValue={selectedProduct?.description || ''}
-              />
-            </div>
-          </div>
+          <AddEditProductForm
+            initialData={selectedProduct}
+            buttonLabel={null}
+          />
         </Modal.Body>
-        <Modal.Footer>
-          <Button auto flat color="error" onClick={() => setVisible(false)}>
-            Batal
-          </Button>
-          <Button auto css={{ 
-            background: 'linear-gradient(135deg, #800000 0%, #b91c1c 100%)',
-            color: 'white'
-          }}>
-            {selectedProduct ? 'Update Produk' : 'Tambah Produk'}
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       {/* Footer */}

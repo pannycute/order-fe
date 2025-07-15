@@ -68,6 +68,7 @@ const AddEditProductForm: React.FC<AddEditProductProps> = ({
 
   const handleSubmit = async () => {
     try {
+      console.log(form);
       if (isEditMode && form.product_id) {
         await updateOne(form.product_id, form);
         showToast("Successfully updated product", "success");
