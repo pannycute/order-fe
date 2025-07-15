@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useOrderItemStore } from '../stores/orderItemStore';
-import { useOrderStore } from '../stores/orderstore';
+import { useOrderStore } from '../stores/orderStore';
 import { useProductStore } from '../stores/productStore';
 import { 
   Card, 

@@ -9,7 +9,7 @@ import { useToast } from "../toast/ToastProvider";
 import { useConfirmationToast } from "../toast/ConfirmationToast";
 import { Edit, Trash2, Eye, HouseIcon, ShoppingCartIcon } from "lucide-react";
 import { Breadcrumbs, Crumb, CrumbLink } from "../breadcrumb/breadcrumb.styled";
-import { useOrderStore } from "../../stores/orderstore";
+import { useOrderStore } from "../../stores/orderStore";
 import { useOrderItemStore } from '../../stores/orderItemStore';
 import { useProductStore } from '../../stores/productStore';
 

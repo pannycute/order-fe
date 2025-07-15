@@ -7,7 +7,7 @@ import { useToast } from "../toast/ToastProvider";
 import { axiosInstance } from "../../utils/axiosInstance";
 import { Dropdown } from "@nextui-org/react"; 
 import { Key } from "react";
-import { Order, useOrderStore } from "../../stores/orderstore";
+import { Order } from "../../stores/orderStore";
 
 interface AddEditOrderProps {
   initialData?: Order | null;

@@ -4,7 +4,7 @@ import { Button, Divider, Input, Modal, Text } from "@nextui-org/react";
 import { Flex } from "../styles/flex";
 import InputSelect from "../input/InputSelect";
 import { useToast } from "../toast/ToastProvider";
-import { PaymentMethod, usePaymentMethodStore } from "../../stores/paymentmethodStore";
+import { PaymentMethod, usePaymentMethodStore } from "../../stores/paymentMethodStore";
 import { axiosInstance } from "../../utils/axiosInstance";
 
 interface AddEditPaymentMethodProps {

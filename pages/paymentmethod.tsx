@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { usePaymentMethodStore } from '../stores/paymentmethodStore';
+import { usePaymentMethodStore } from '../stores/paymentMethodStore';
 import {
   Card,
   Text,
