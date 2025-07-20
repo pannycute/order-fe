@@ -28,7 +28,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   // Daftar halaman yang tidak pakai layout
-  const noLayoutPages = ["/login", "/register"]; // tambah sesuai kebutuhan
+  const noLayoutPages = ["/","/login", "/register"]; // tambah sesuai kebutuhan
   const isNoLayout = noLayoutPages.includes(router.pathname);
 
   useEffect(() => {
